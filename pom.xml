@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.jmeter</groupId>
+    <version>1.0</version>
+    <artifactId>dubbo-plugin</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_core</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-x-discovery</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-handler</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-epoll</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_java</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>3.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sgroschupf</groupId>
+            <artifactId>zkclient</artifactId>
+            <version>0.1</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${basedir}/src/main/groovy"/>
+                                <taskdef name="groovyc"
+                                         classname="org.codehaus.groovy.ant.Groovyc">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </taskdef>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <groovyc destdir="${project.build.outputDirectory}"
+                                         srcdir="${basedir}/src/main/groovy/" listfiles="true">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </groovyc>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${basedir}/src/test/groovy"/>
+                                <taskdef name="groovyc"
+                                         classname="org.codehaus.groovy.ant.Groovyc">
+                                    <classpath refid="maven.test.classpath"/>
+                                </taskdef>
+                                <mkdir dir="${project.build.testOutputDirectory}"/>
+                                <groovyc destdir="${project.build.testOutputDirectory}"
+                                         srcdir="${basedir}/src/test/groovy/" listfiles="true">
+                                    <classpath refid="maven.test.classpath"/>
+                                </groovyc>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
